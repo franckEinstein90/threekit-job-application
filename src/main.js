@@ -1,9 +1,9 @@
 "use strict"
 const THREE = require('three')
-
+const OrbitControls = require('./orbitControls').OrbitControls
 
 let initGrid = function(scene){
-    let gridHelper = new THREE.GridHelper(1000, 200)
+    let gridHelper = new THREE.GridHelper(100, 100)
     scene.add(gridHelper)
 }
 let initLights = function(scene){
@@ -16,14 +16,14 @@ let initLights = function(scene){
 $(function(){
 
     let socket = io()
-
-
-    let scene, camera, container, renderer, geometry, material, mesh
-
+    let scene, camera, container, renderer, cameraControls 
+    let render = function(){
+        renderer.render(scene, camera)
+    }
     container = document.querySelector('#scene-container')
 
     camera = new THREE.PerspectiveCamera( 45, container.clientWidth / container.clientHeight, 1, 10000)
-    camera.position.set( 200, 800, 1300)
+    camera.position.set( 100, 100, 100)
     camera.lookAt(0,0,0)
 
 
@@ -38,5 +38,7 @@ $(function(){
     renderer.setPixelRatio( window.devicePixelRatio ) 
 
     container.appendChild( renderer.domElement )
-    renderer.render( scene, camera )
+    cameraControls = new OrbitControls( camera, renderer.domElement)
+    cameraControls.addEventListener('change', render)
+    render()
 }); 

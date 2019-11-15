@@ -5,10 +5,10 @@
   "scripts": {
     "start": "nodemon ./bin/www"
   },
-  "_moduleAliases" : {
-    "@src":"src", 
+  "_moduleAliases": {
+    "@src": "src",
     "@server": "src/server"
-  }, 
+  },
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",

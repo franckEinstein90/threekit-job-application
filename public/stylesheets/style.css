@@ -13,6 +13,6 @@ a {
 #scene-container {
     position: absolute; 
     width: 80%; 
-    height: 50%; 
+    height: 80%; 
     background-color:red; 
 }
