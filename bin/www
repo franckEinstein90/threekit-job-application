@@ -3,10 +3,13 @@
 /**
  * Module dependencies.
  */
+"use strict"
 
-var app = require('../app');
+require('module-alias/register')
+
+const app = require('../app')
 var debug = require('debug')('threekit-job-application:server');
-var http = require('http');
+let http = require('http');
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +22,11 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app)
+const io = require('socket.io')(server)
+io.on('connection', function(socket){
+    console.log('a user connected')
+})
 
 /**
  * Listen on provided port, on all network interfaces.

@@ -50062,6 +50062,10 @@ let initLights = function(scene){
 }
 
 $(function(){
+
+    let socket = io()
+
+
     let scene, camera, container, renderer, geometry, material, mesh
 
     container = document.querySelector('#scene-container')
