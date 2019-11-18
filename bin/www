@@ -24,9 +24,23 @@ app.set('port', port);
 
 const server = http.createServer(app)
 const io = require('socket.io')(server)
+const users = require('@server/users.js').users
+
+
 io.on('connection', function(socket){
-    console.log('a user connected')
+
+    if(users.freeSpot()){ //there is a free spot for this user
+        let player = users.newPlayer()
+        player.status = 'on'
+        console.log(`${player.id} is ready to play`)
+        socket.emit('new player', player) 
+    }
+    else{
+        socket.emit('player limit')
+    } 
 })
+
+
 
 /**
  * Listen on provided port, on all network interfaces.

@@ -50047,51 +50047,40 @@
 
 },{}],2:[function(require,module,exports){
 "use strict"
-const THREE = require('three')
-const OrbitControls = require('./orbitControls').OrbitControls
 
-let initGrid = function(scene){
-    let gridHelper = new THREE.GridHelper(100, 100)
-    scene.add(gridHelper)
-}
-let initLights = function(scene){
-    let ambientLight = new THREE.AmbientLight( 0x606060 )
-    scene.add( ambientLight )
-    let directionalLight = new THREE.DirectionalLight(0xffffff)
-    scene.add( directionalLight)
-}
+const scene = require('./scene').scene
 
 $(function(){
+   scene.init()
+   scene.render()
 
-    let socket = io()
-    let scene, camera, container, renderer, cameraControls 
-    let render = function(){
-        renderer.render(scene, camera)
+   //new connection, check if there's an open spot
+
+   let socket = io()
+   socket.on('new player', function(playerInfo){
+       let $loginPage = $('#welcome')
+       $loginPage.html(`<H1>Welcome ${playerInfo.id}</H1>`)
+        })
+    
+   socket.on('player limit', function(){
+        let $loginPage = $('#welcome' )
+        $loginPage.html(`<H1>There are already 4 players. Please try again later</H1>`)
+   })
+
+/*    let onWindowResize = function(){
+        camera.aspect = container.clientWidth / container.clientHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize( container.clientWidth, container.clientHeight )
     }
-    container = document.querySelector('#scene-container')
-
-    camera = new THREE.PerspectiveCamera( 45, container.clientWidth / container.clientHeight, 1, 10000)
-    camera.position.set( 100, 100, 100)
-    camera.lookAt(0,0,0)
+    window.addEventListener( 'resize', onWindowResize )*/
 
 
-    scene = new THREE.Scene()
-    scene.background = new THREE.Color( 'skyblue' )
 
-    initGrid(scene)
-    initLights(scene)
+   
 
-    renderer = new THREE.WebGLRenderer( {antialias: true} )
-    renderer.setSize( container.clientWidth, container.clientHeight)
-    renderer.setPixelRatio( window.devicePixelRatio ) 
-
-    container.appendChild( renderer.domElement )
-    cameraControls = new OrbitControls( camera, renderer.domElement)
-    cameraControls.addEventListener('change', render)
-    render()
 }); 
 
-},{"./orbitControls":3,"three":1}],3:[function(require,module,exports){
+},{"./scene":4}],3:[function(require,module,exports){
 /**
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
@@ -50100,7 +50089,8 @@ $(function(){
  * @author erich666 / http://erichaines.com
  * @author ScieCode / http://github.com/sciecode
  */
-const THREE = require('three')
+
+const   THREE = require('three')
 const	EventDispatcher = THREE.EventDispatcher
 const	MOUSE = THREE.MOUSE
 const	Quaternion =THREE.Quaternion
@@ -50141,7 +50131,7 @@ var OrbitControls = function ( object, domElement ) {
 	// How far you can orbit vertically, upper and lower limits.
 	// Range is 0 to Math.PI radians.
 	this.minPolarAngle = 0; // radians
-	this.maxPolarAngle = Math.PI; // radians
+	this.maxPolarAngle = Math.PI/2; // radians
 
 	// How far you can orbit horizontally, upper and lower limits.
 	// If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
@@ -51285,4 +51275,64 @@ module.exports = {
     OrbitControls, 
     MapControls }
 
-},{"three":1}]},{},[2]);
+},{"three":1}],4:[function(require,module,exports){
+"use strict"
+
+const THREE = require('three')
+const OrbitControls = require('./orbitControls').OrbitControls
+
+
+const scene = (function (){
+    let _scene, _container, _renderer, _camera, _cameraControls
+
+    _scene = new THREE.Scene()
+    _scene.background = new THREE.Color( 'skyblue' )
+
+   return{
+     init: function(){
+        _container = document.querySelector('#scene-container')
+
+        _renderer = new THREE.WebGLRenderer( {antialias: true} )
+        _renderer.setSize( _container.clientWidth, _container.clientHeight)
+        _renderer.setPixelRatio( window.devicePixelRatio ) 
+        _container.appendChild( _renderer.domElement )
+
+        scene.initCamera()
+        scene.initGrid()
+        scene.initLights()
+        _cameraControls = new OrbitControls( _camera, _renderer.domElement)
+        _cameraControls.addEventListener('change', scene.render)
+        scene.render()
+     }, 
+     initCamera: function(){
+        _camera = new THREE.PerspectiveCamera(45, 
+            _container.clientWidth / _container.clientHeight, 1, 10000)
+        _camera.position.set( 100, 100, 100)
+        _camera.lookAt(0,0,0)
+     },
+
+     initGrid: function(){
+        let gridHelper = new THREE.GridHelper(100, 100)
+        _scene.add(gridHelper)
+     }, 
+
+     initLights: function( ){
+        let ambientLight, directionalLight 
+        ambientLight = new THREE.AmbientLight( 0x606060 )
+        _scene.add( ambientLight )
+        directionalLight = new THREE.DirectionalLight(0xffffff)
+        _scene.add( directionalLight)
+     }, 
+
+     render: function(){
+        _renderer.render(_scene, _camera)
+     }
+   }
+
+})()
+
+module.exports = {
+    scene
+}
+
+},{"./orbitControls":3,"three":1}]},{},[2]);
