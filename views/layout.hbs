@@ -15,7 +15,7 @@
 
   <body class='w3-light-grey'>
 
-      <div id="welcome">da</div> 
+<!--      <div id="welcome">da</div> -->
 
       <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
       <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
@@ -26,11 +26,13 @@
 
 <!-- Sidebar/menu -->
 <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" 
-    style="z-index:3;width:150px;" id="mySidebar">
+     style="z-index:3;width:150px;" id="mySidebar">
     <a href="#" class="w3-bar-item w3-button w3-padding">
-        <i class="fa fa-users fa-fw"></i>&nbsp; players</a>
+        <i class="fa fa-users fa-fw"></i>&nbsp; online</a>
         <ul id="user-list">
+
         <li><a href="www.atv.com">player 1</a></li>
+
         <ul>
   </div>
 </nav>
@@ -38,9 +40,6 @@
 <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 <div class="w3-main" style="margin-left:160px;margin-top:43px;margin-right:10px">
 <!-- Header -->
-  <header class="w3-container" style="padding-top:22px">
-    <h5><b>{{title}}</b></h5>
-  </header>
      <div class="w3-panel">
      <div class="w3-row-padding" style="margin:0 -16px">
      {{{body}}}

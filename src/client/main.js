@@ -6,13 +6,28 @@ $(function(){
    scene.init()
    scene.render()
 
+/*   let logData = function(){
+    navigator.sendBeacon("/left", {id:'0dsds'})
+   }
+   window.addEventlistener("unload", logData, false)*/
+   
    //new connection, check if there's an open spot
 
    let socket = io()
 
    socket.on('new player', function(playerInfo){
-       let $loginPage = $('#welcome')
-       $loginPage.html(`<H1>Welcome ${playerInfo.id}</H1>`)
+       let $playerList = $('#user-list')
+
+       $playerList.empty()
+       playerInfo.players.forEach(
+            p => {
+               if(p.status === "on"){
+                 $('#user-list').append(`<li style="color:red">${p.id}</li>`)
+               }
+               else{
+                 $('#user-list').append(`<li style="color:grey">${p.id}</li>`)
+               }
+            })
    })
     
    socket.on('player limit', function(){
@@ -26,7 +41,6 @@ $(function(){
 		renderer.setSize( container.clientWidth, container.clientHeight )
     }
     window.addEventListener( 'resize', onWindowResize )*/
-
 
 
    

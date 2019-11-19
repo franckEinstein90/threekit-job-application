@@ -29,17 +29,21 @@ const users = require('@server/users.js').users
 
 io.on('connection', function(socket){
 
+    socket.on('disconnect', function(){
+        console.log('user left')
+        return 
+    })
+
     if(users.freeSpot()){ //there is a free spot for this user
         let player = users.newPlayer()
         player.status = 'on'
         console.log(`${player.id} is ready to play`)
-        socket.emit('new player', player) 
+        socket.emit('new player', {player, players: users.players}) 
     }
-    else{
-        socket.emit('player limit')
+    else{ 
+        socket.emit('player limit') 
     } 
 })
-
 
 
 /**

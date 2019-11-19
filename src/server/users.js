@@ -9,15 +9,18 @@ const users = (function(){
     ]
 
     return {
+      players: userRegister, 
 
       freeSpot: function(){
          return (userRegister
-                  .filter ( user => user.status === 'off' ))
-                  .length >= 1
+            .filter ( user => user.status === 'off' ))
+            .length >= 1
         },
- 
+       
       newPlayer: function(){
-            let freeSpots = userRegister.filter( user => user.status === 'off' )
+            let freeSpots = userRegister.filter( 
+                    user => user.status === 'off' 
+            )
             if (freeSpots.length === 0) return null
             return freeSpots[0] 
       }  
