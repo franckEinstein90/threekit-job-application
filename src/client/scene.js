@@ -2,7 +2,7 @@
 
 const THREE = require('three')
 const OrbitControls = require('./orbitControls').OrbitControls
-
+const ColladaLoader  = require('./colladaLoader').ColladaLoader
 
 const scene = (function (){
     let _scene, _container, _renderer, _camera, _cameraControls
@@ -22,9 +22,28 @@ const scene = (function (){
         scene.initCamera()
         scene.initGrid()
         scene.initLights()
+
+
         _cameraControls = new OrbitControls( _camera, _renderer.domElement)
         _cameraControls.addEventListener('change', scene.render)
+
+
+        var loadingManager = new THREE.LoadingManager( function () {
+
+         scene.add( elf );
+
+      } );
+
+        var loader = new ColladaLoader( loadingManager );
+				loader.load( './elf.dae', function ( collada ) {
+
+					elf = collada.scene;
+
+				} );
+
         scene.render()
+
+
      }, 
      initCamera: function(){
         _camera = new THREE.PerspectiveCamera(45, 
