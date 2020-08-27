@@ -1,51 +1,53 @@
 "use strict"
 
-
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
-
-
-const app = express()
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const cronJob = require('node-cron')
-const appPulse = require('@server/appPulse').appPulse
 
-let initApp = function(){
-    cronJob.schedule('* * * * *', appPulse.echo)
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'hbs');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 
-    app.use(logger('dev'));
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: false }));
-    app.use(cookieParser());
-    app.use(express.static(path.join(__dirname, 'public')));
+const initAppExpress = function( app ){
+    app.express.set('views', path.join(__dirname, 'views'));
+    app.express.set('view engine', 'hbs');
 
-    app.use('/', indexRouter);
-    app.use('/users', usersRouter);
+    app.express.use(logger('dev'));
+    app.express.use(express.json());
+    app.express.use(express.urlencoded({ extended: false }));
+    app.express.use(cookieParser());
+    app.express.use(express.static(path.join(__dirname, 'public')));
 
-// catch 404 and forward to error handler
-    app.use(function(req, res, next) {
+    app.express.use('/', indexRouter);
+    app.express.use('/users', usersRouter);// catch 404 and forward to error handler
+
+    const createError = require('http-errors');
+    app.express.use(function(req, res, next) {
       next(createError(404));
     })
+
+    app.express.use(function(err, req, res, next) {
+      // set locals, only providing error in development
+      res.locals.message = err.message;
+      res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+      // render the error page
+      res.status(err.status || 500);
+      res.render('error');
+    });
 }
 
-initApp()
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+const initApp = function( app ){
+  app.express = express();
+  initAppExpress( app ); 
+  const appPulse = require('@server/appPulse').appPulse; 
+  cronJob.schedule('* * * * *', appPulse.echo);
+  return app;  
+}
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
-module.exports = app;
+
+module.exports = {
+  initApp
+}

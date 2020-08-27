@@ -54602,28 +54602,39 @@ $(function(){
    }
    window.addEventlistener("unload", logData, false)*/
    
-   //new connection, check if there's an open spot
 
-   let socket = io()
+   const socket = io(); 
+   const user = {
+
+   }; 
+
+   socket.on('welcome', function(welcomePackage){
+      if('id' in user && 'clientSocketId' in user) { //already been initialized
+         socket.emit("replace",{user}); 
+         user.clientSocketId = welcomePackage.playerInfo.clientSocketId; 
+      } else {
+         user.id = welcomePackage.playerInfo.id; 
+         user.clientSocketId = welcomePackage.playerInfo.clientSocketId; 
+      }
+  })
 
    socket.on('new player', function(playerInfo){
        let $playerList = $('#user-list')
-
        $playerList.empty()
-       playerInfo.players.forEach(
+       playerInfo.updatedList.forEach(
             p => {
                if(p.status === "on"){
-                 $('#user-list').append(`<li style="color:red">${p.id}</li>`)
+                 $('#user-list').append(`<li style="color:red">Player ${p.id}</li>`)
                }
                else{
-                 $('#user-list').append(`<li style="color:grey">${p.id}</li>`)
+                 $('#user-list').append(`<li style="color:grey">Player ${p.id}</li>`)
                }
             })
    })
     
-   socket.on('player limit', function(){
-        let $loginPage = $('#welcome' )
-        $loginPage.html(`<H1>There are already 4 players</H1> <H2>Please try again later</H2>`)
+   socket.on('player limit', function( players ){
+      const $loginPage = $('#welcome' )
+      $loginPage.html(`<H1>There are already 4 players</H1> <H2>Please try again later</H2>`)
    })
 
 /*    let onWindowResize = function(){
@@ -55862,6 +55873,8 @@ const scene = (function (){
 
         _cameraControls = new OrbitControls( _camera, _renderer.domElement)
         _cameraControls.addEventListener('change', scene.render)
+
+
         var loadingManager = new THREE.LoadingManager( function () {
 
          scene.add( elf );

@@ -1,48 +1,62 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-"use strict"
+"use strict"; 
 
 require('module-alias/register')
 
-const app = require('../app')
-var debug = require('debug')('threekit-job-application:server');
-let http = require('http');
+const app = {
+  
+}
 
-/**
- * Get port from environment and store in Express.
- */
+require('../app').initApp( app ); 
+require('@server/users.js').addPlayerRegistry( app ); 
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+const debug = require('debug')('threekit-job-application:server');
+const http = require('http');
+const port = normalizePort(process.env.PORT || '3000');
+app.express.set('port', port);
 
-/**
- * Create HTTP server.
- */
 
-const server = http.createServer(app)
+
+const server = http.createServer(app.express)
 const io = require('socket.io')(server)
-const users = require('@server/users.js').users
 
 
 io.on('connection', function(socket){
 
-    socket.on('disconnect', function(){
-        console.log('user left')
-        return 
+  const clientSocketId = socket.client.conn.id
+
+  socket.on('replace', function(userInfo){
+
+  })
+
+  socket.on('disconnect', function(){
+      const outgoingPlayer = app.players.removeByClientConnectionId(clientSocketId); 
+      console.log(`Player ${outgoingPlayer.id} left the game`)
+      return 
     })
 
-    if(users.freeSpot()){ //there is a free spot for this user
-        let player = users.newPlayer()
-        player.status = 'on'
-        console.log(`${player.id} is ready to play`)
-        socket.emit('new player', {player, players: users.players}) 
-    }
-    else{ 
-        socket.emit('player limit') 
-    } 
+  if(app.players.hasFreeSpot()){ //there is a free spot for this user
+
+    const player = app.players.createNewPlayer( clientSocketId )
+    player.status = 'on'
+    console.log(`Player #${player.id} is online`)
+
+    //broadcast to everyone except new player
+    socket.broadcast.emit('new player', {
+          newPlayer: player, 
+          updatedList: app.players.list()
+        }) 
+
+    //broadcast to new player only
+    io.to(clientSocketId).emit('welcome', {
+          playerInfo:player,
+          players: app.players.list()
+        }); 
+
+  } else{ 
+    socket.emit('player limit', {players: app.players}) 
+  } 
 })
 
 

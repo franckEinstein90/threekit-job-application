@@ -1,33 +1,37 @@
 "use strict"
+const Player = require('@common/Player').Player;
 
-const users = (function(){
-    let userRegister = [
-        {id: 'Player 1', status: 'off'},
-        {id: 'Player 2', status: 'off'}, 
-        {id: 'Player 3', status: 'off'}, 
-        {id: 'Player 4', status: 'off'}
-    ]
+const addPlayerRegistry = function( app ){
 
-    return {
-      players: userRegister, 
+    const maxPlayers = 4;
+    const userRegister = new Map(); 
 
-      freeSpot: function(){
-         return (userRegister
-            .filter ( user => user.status === 'off' ))
-            .length >= 1
-        },
+    app.players = {
+
+      list : () => {
+          const funcResult = []; 
+          userRegister.forEach(v=>funcResult.push(v))
+          return funcResult; 
+      },
+
+      hasFreeSpot: () => userRegister.size < maxPlayers, 
        
-      newPlayer: function(){
-            let freeSpots = userRegister.filter( 
-                    user => user.status === 'off' 
-            )
-            if (freeSpots.length === 0) return null
-            return freeSpots[0] 
-      }  
+      createNewPlayer: function(clientSocketId){
+          const newPlayer = new Player({clientSocketId}) 
+          userRegister.set(clientSocketId, newPlayer);
+          return newPlayer; 
+      }, 
+      
+    removeByClientConnectionId: function(clientSocketId){
+        const playerToRemove = userRegister.get(clientSocketId); 
+        userRegister.delete(clientSocketId); 
+        return clientSocketId; 
+    }
 
     }
-})()
+    return app; 
+}
 
 module.exports = {
-    users
+   addPlayerRegistry 
 }
